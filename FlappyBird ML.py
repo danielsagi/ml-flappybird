@@ -32,7 +32,7 @@ PIPE_HEAD_HEIGHT = 30
 PIPE_HEAD_OFFSET = 4
 PIPE_HEAD_WIDTH = BLOCKS_WIDTH + PIPE_HEAD_OFFSET
 #
-
+Start_ML = False
 DIFF_FACTOR = 25
 horizontal_distance, vertical_distance = 0, 0
 Flaps_Info_Array = []
@@ -68,7 +68,6 @@ class Bird:
         picture = pygame.transform.scale(self.bird_image, (self.width,self.height))
         picture = pygame.transform.rotate(picture, self.tilt)
         gameDisplay.blit(picture, (self.x, self.y, self.width, self.height))
-
 
 class Pipe:
     def __init__(self, height, isUp):
@@ -159,18 +158,20 @@ class Movie:
             image_rect.x -= BACK_MOVIE_SPEED
             gameDisplay.blit(self.source_image, image_rect)
 
-def events(bird):
-    global Flaps_Info_Array, Flaps_Results_Array
+def events(bird, pipes):
+    global Flaps_Info_Array, Flaps_Results_Array, Start_ML
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return "QUIT"
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                Flaps_Info_Array.append((horizontal_distance, vertical_distance))
-                Flaps_Results_Array.append(1)
+                Flaps_Info_Array.append([horizontal_distance, vertical_distance])
+                Flaps_Results_Array.append([1])
                 print Flaps_Info_Array[len(Flaps_Info_Array) -1], Flaps_Results_Array[len(Flaps_Results_Array) -1]
                 bird.do_flap()
                 return "CLAP"
+            if event.key == pygame.K_s:
+                Start_ML = not Start_ML
 
 def do_physics(bird):
     velocity = 0.15
@@ -183,13 +184,13 @@ def do_physics(bird):
     if bird.speed > -90:
         bird.tilt = bird.speed * BIRD_ANDGLE_FACTOR
 
-def game_over_stall(bird):
+def game_over_stall(bird, pipes):
     global Score
     while True:
         gameover_surface = game_over_font.render("Game Over!", False, (0, 255, 0))
         gameDisplay.blit(gameover_surface, (W/2 - 120, H/3))
         pygame.display.update()
-        event = events(bird)
+        event = events(bird, pipes)
         if event == "QUIT":
             pygame.quit()
             sys.exit()
@@ -217,10 +218,12 @@ def main():
 
     clf = tree.DecisionTreeClassifier()
 
+    Flaps_Info_Array.append([0, 0])
+    Flaps_Results_Array.append([0])
     pipes = PipeSet()
     while True:
         FrameCount += 1
-        if events(bird) == "QUIT": break
+        if events(bird, pipes) == "QUIT": break
 
 
         if FrameCount % 5 == 0 and len(Flaps_Info_Array):
@@ -228,13 +231,13 @@ def main():
             diff = numpy.subtract(Flaps_Info_Array[len(Flaps_Info_Array) - 1],
                                   (horizontal_distance, vertical_distance))
             if abs(diff[0]) > DIFF_FACTOR and abs(diff[1]) > DIFF_FACTOR:
-                Flaps_Info_Array.append((horizontal_distance, vertical_distance))
-                Flaps_Results_Array.append(0)
+                Flaps_Info_Array.append([horizontal_distance, vertical_distance])
+                Flaps_Results_Array.append([0])
                 print Flaps_Info_Array[len(Flaps_Info_Array) - 1], Flaps_Results_Array[len(Flaps_Results_Array) - 2]
 
         # if bird is out of boundaries of screen
         if bird.y >= H + bird.height:
-            game_over_stall(bird)
+            game_over_stall(bird, pipes)
 
         gameDisplay.fill(SKY_BLUE)
 
@@ -247,6 +250,7 @@ def main():
             horizontal_distance = pipes.info_rect.x - bird.bird_rect.x
         vertical_distance = pipes.info_rect.y - bird.bird_rect.y
 
+        # Texts On Screen
         horizontal_surface = score_font.render("horizontal: " + str(horizontal_distance), False, BLACK)
         vertical_surface = score_font.render("vertical: " + str(vertical_distance), False, BLACK)
         score_surface = score_font.render(" " +str(Score), False, BLACK)
@@ -262,9 +266,15 @@ def main():
             pipes.move_block(BLOCKS_SPEED)
             pipes.draw_blocks()
             if pipes.is_colliding_bird(bird):
-                game_over_stall(bird)
+                game_over_stall(bird, pipes)
+                pipes = PipeSet()
 
         clf = clf.fit(Flaps_Info_Array, Flaps_Results_Array)
+        if Start_ML:
+            if all(clf.predict([[horizontal_distance, vertical_distance]])):
+                bird.do_flap()
+                print "Clap"
+
 
         pygame.display.update()
         Clock.tick(FPS)
