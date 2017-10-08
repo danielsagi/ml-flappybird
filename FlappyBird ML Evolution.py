@@ -37,7 +37,7 @@ miles_count = 0
 max_fitness = 0
 FUCK_FACTOR = 4
 """-----------Control Panel------------"""
-FPS = 100
+FPS = 1000
 VELOCITY = 0.15
 BLOCKS_SPEED = 3
 BACK_MOVIE_SPEED = 1
@@ -153,7 +153,6 @@ class FlappyLearn:
     def predict(self, data):
         a, b = data
         return self.clf.predict([[a, b]])
-
 class Bird:
     def __init__(self, id):
         self.id = id
@@ -194,7 +193,6 @@ class Bird:
         picture = pygame.transform.scale(self.bird_image, (self.rect.width, self.rect.height))
         picture = pygame.transform.rotate(picture, self.tilt)
         gameDisplay.blit(picture, (self.rect.x, self.rect.y, self.rect.width, self.rect.height))
-
 class Evolution():
     def __init__(self, num_of_birds):
         global bird_id
@@ -302,7 +300,6 @@ def do_physics(bird):
 
     if bird.speed > -90:
         bird.tilt = bird.speed * BIRD_ANDGLE_FACTOR
-
 def events():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

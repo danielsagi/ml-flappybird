@@ -7,6 +7,28 @@ from random import randint
 
 """----------------------------------FLAPPY BIRD-----------------------------------------
 ------------------------------------BY: DANIEL SAGI-----------------------------------"""
+
+"""
+Instructions:
+SPACE - jump
+C - continue
+S - start AI
+R - reset memory of AI
+
+Program works as follows:
+You start playing, (by pressing the space bar)
+and at which point you feel satisfied by your performance, you press - S
+Now the AI will start imitating you, as you played before.
+Do not worry too much about failing, the AI will erase any failure made by you. (or at least the obvious ones)
+
+(If you are really bad at this game, there is no need for you to restart, only to press the - R,
+to reset to AI memory)
+
+When you see a Game Over message, just press - C to continue.
+
+"""
+
+
 Score = 0
 FrameCount = 0
 exit = False
