@@ -34,7 +34,8 @@ PIPE_HEAD_WIDTH = BLOCKS_WIDTH + PIPE_HEAD_OFFSET
 #
 bird_id = 0
 miles_count = 0
-
+max_fitness = 0
+FUCK_FACTOR = 4
 """-----------Control Panel------------"""
 FPS = 100
 VELOCITY = 0.15
@@ -147,6 +148,7 @@ class FlappyLearn:
         self.Flaps_Results_Array = []
 
     def fit(self):
+        # print type(self.Flaps_Info_Array), type(self.Flaps_Results_Array)
         self.clf = self.clf.fit(self.Flaps_Info_Array, self.Flaps_Results_Array)
     def predict(self, data):
         a, b = data
@@ -167,7 +169,10 @@ class Bird:
         self.fitness = 0
 
     def calculate_fitness(self, pipes):
+        global max_fitness
         self.fitness = FrameCount
+        if self.fitness > max_fitness:
+            max_fitness = self.fitness
 
     def kill(self):
         self.alive = False
@@ -207,8 +212,85 @@ class Evolution():
             bird.mind.add_random_training_data(15)
             bird.mind.fit()
 
+    def elitism_selection(self):
+        # getting the two most fittest birds of the current generation
+        return sorted(self.birds, key=lambda x: x.fitness, reverse=True)[:2]
 
-    def new_generation(self):
+    # CrossOver
+    # Taking the two most fittest birds, and returning their demon love children
+    def love(self, female_bird, male_bird):
+            female_genes = (female_bird.mind.Flaps_Info_Array, female_bird.mind.Flaps_Results_Array)
+            male_genes = (male_bird.mind.Flaps_Info_Array, male_bird.mind.Flaps_Results_Array)
+
+            """After Some Time... *CENSORED*... And The Seed Is IN!"""
+            """Now, Mixing Some Genes"""
+            # two point crossover
+            # selecting two random points at the bird memory
+            genes_chain_len = len(female_genes[0])
+            slice_indexes = (randint(0, genes_chain_len / 2), randint(genes_chain_len/ 2, genes_chain_len) )
+            # possible that last random index needs to be 1 less ??
+
+            # mixing the genes for two new babies
+            first_baby_genes = []
+            for i in range(2):
+                first_baby_genes.append(female_genes[i][:slice_indexes[0]] + \
+                                        male_genes[i][slice_indexes[0]:slice_indexes[1]] + \
+                                        female_genes[i][slice_indexes[1]:genes_chain_len])
+
+            second_baby_genes = []
+            for i in range(2):
+                second_baby_genes.append(male_genes[i][:slice_indexes[0]] + \
+                                        female_genes[i][slice_indexes[0]:slice_indexes[1]] + \
+                                        male_genes[i][slice_indexes[1]:genes_chain_len])
+
+            # returning the babies, separated from their parents at birth,
+            # in the form of a tuple containing two lists
+            return (first_baby_genes, second_baby_genes)
+
+    # fucking them up a bit with freshly random generated genes
+    def fuck_them_up_a_bit(self, children):
+        for child_gene_chains in children:
+            child_info_chain = child_gene_chains[0]
+            child_result_chain = child_gene_chains[1]
+
+            for i in range(FUCK_FACTOR):
+                # selecting random gene to alter
+                random_index = randint(0,len(child_info_chain))
+                for i, info_gene in enumerate(child_info_chain):
+                    if i == random_index:
+                        child_info_chain[i] = [randint(-500, 500), randint(-500, 500)]
+                        child_result_chain[i] = [randint(0,1)]
+
+
+    # Creating new generation of birds by using,
+    # 1. Elitism Selection
+    # 2. Two Points CrossOver
+    # 3. Mutation
+    def advance_generation(self):
+        global bird_id, FrameCount
+        FrameCount = 0
+        new_birds = []
+
+        # selecting two most fittest birds
+        woman_bird, man_bird = self.elitism_selection()
+
+        for i in range(self.num_of_birds / 2):
+            # making them fall in love, and taking their children, repeatedly
+            children_genes = self.love(woman_bird, man_bird)
+            # then mutating a bit of their genes for a finale
+            self.fuck_them_up_a_bit(children_genes)
+
+            for i in range(2):
+                bird = Bird(bird_id)
+                bird.mind.Flaps_Info_Array = children_genes[i][0]
+                bird.mind.Flaps_Results_Array = children_genes[i][1]
+
+                bird.mind.fit()
+                new_birds.append(bird)
+                bird_id += 1
+
+        self.current_generation += 1
+        self.birds = new_birds
 
     def alive_birds(self):
         return [bird for bird in self.birds if bird.alive]
@@ -236,11 +318,16 @@ def init_pygame():
     pygame.init()
 def print_stats(evo):
     fittest_birds = sorted(evo.birds, key=lambda x: x.fitness, reverse=True)[:5]
+
+    generation = score_font.render("Generation: " + str(evo.current_generation) + " | Max Fitness: " + str(max_fitness), False, SKY_BLUE)
+    gameDisplay.blit(generation, (W/ 4, H - 70))
+
     for index ,bird in enumerate(fittest_birds):
         color = BLACK
         if not bird.alive: color = RED
-        bird_surface = score_font.render("Bird #"+str(bird.id) + " Fitness:"+ str(bird.fitness), False, color)
+        bird_surface = score_font.render("Bird #"+str(bird.id) + " Score: " + str(bird.score) + " Fitness:"+ str(bird.fitness), False, color)
         gameDisplay.blit(bird_surface, (0, index * 25))
+
 
 
 """------------ MAIN --------------"""
@@ -249,11 +336,12 @@ def main():
     init_pygame()
 
     # Creating Birds
-    evo = Evolution(50)
+    evo = Evolution(6)
     evo.do_first_generation()
 
     back_movie = Movie(background)
     pipes = PipeSet()
+
     while True:
         # Visuals
         gameDisplay.fill(SKY_BLUE)
@@ -298,7 +386,9 @@ def main():
         Clock.tick(FPS)
 
         if events() == "QUIT": break
-        if len(evo.alive_birds()) == 0: break
+        if len(evo.alive_birds()) == 0:
+            pipes = PipeSet()
+            evo.advance_generation()
 
     pygame.quit()
     sys.exit()
