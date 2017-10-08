@@ -122,7 +122,7 @@ def main():
         bird.draw()
 
         pygame.display.update()
-        Clock.tick(FPS)
+        Clock.tick(500)
 
     pygame.quit()
     sys.exit()
