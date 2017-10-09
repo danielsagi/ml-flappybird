@@ -334,7 +334,6 @@ def print_stats(evo):
         gameDisplay.blit(bird_surface, (0, index * 25))
 
 
-
 """------------ MAIN --------------"""
 def main():
     global FrameCount
