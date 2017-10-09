@@ -36,15 +36,15 @@ bird_id = 0
 miles_count = 0
 max_fitness = 0
 FUCK_FACTOR = 2
-RANDOM_GENE_FACTOR = 500
+RANDOM_GENE_FACTOR = 250
 MEMORY_SIZE = 15
 FLAP = 1
 NO_FLAP = 0
 
 """-----------Control Panel------------"""
-FPS = 100
+FPS = 120
 VELOCITY = 0.15
-BLOCKS_SPEED = 3
+BLOCKS_SPEED = 4
 BACK_MOVIE_SPEED = 1
 BIRD_ANDGLE_FACTOR = 3.1
 BIRD_FLAP_FORCE = 5
@@ -110,8 +110,6 @@ class PipeSet:
         self.info_rect.x -= offset
 
     def is_colliding_bird(self, bird):
-        # check_up_rect = pygame.Rect(self.up_pipe_rect.x, self.up_pipe_rect.y, self.up_pipe_rect.height, self.up_pipe_rect.width)
-        # check_down_rect = pygame.Rect(self.down_pipe_rect.x, self.down_pipe_rect.y, self.down_pipe_rect.height, self.down_pipe_rect.width)
         return self.up_pipe_rect.colliderect(bird.rect) or self.down_pipe_rect.colliderect(bird.rect)
 class Movie:
     def __init__(self, image):

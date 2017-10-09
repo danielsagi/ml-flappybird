@@ -55,8 +55,8 @@
       <file leaf-file-name="FlappyBird ML Evolution.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/FlappyBird ML Evolution.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1298">
-              <caret line="194" column="24" lean-forward="true" selection-start-line="194" selection-start-column="24" selection-end-line="194" selection-end-column="24" />
+            <state relative-caret-position="136">
+              <caret line="39" column="16" lean-forward="true" selection-start-line="39" selection-start-column="16" selection-end-line="39" selection-end-column="16" />
               <folding>
                 <element signature="e#1135#2351#0" expanded="false" />
                 <element signature="e#1177#1599#0" expanded="true" />
@@ -64,32 +64,32 @@
                 <element signature="e#2399#3186#0" expanded="true" />
                 <element signature="e#3223#3347#0" expanded="true" />
                 <element signature="e#3391#3520#0" expanded="true" />
-                <element signature="e#3569#3934#0" expanded="true" />
-                <element signature="e#3952#4859#0" expanded="false" />
-                <element signature="e#3987#4151#0" expanded="true" />
-                <element signature="e#4189#4859#0" expanded="true" />
-                <element signature="e#4912#5025#0" expanded="true" />
-                <element signature="e#5085#5205#0" expanded="true" />
-                <element signature="e#5256#5368#0" expanded="true" />
-                <element signature="e#5412#5476#0" expanded="true" />
-                <element signature="e#5505#5653#0" expanded="true" />
-                <element signature="e#5691#5744#0" expanded="true" />
-                <element signature="e#5793#6226#0" expanded="true" />
-                <element signature="e#6276#6480#0" expanded="true" />
-                <element signature="e#6510#6570#0" expanded="true" />
-                <element signature="e#6603#6631#0" expanded="true" />
-                <element signature="e#6677#6846#0" expanded="true" />
-                <element signature="e#6897#6935#0" expanded="true" />
-                <element signature="e#6965#7210#0" expanded="true" />
-                <element signature="e#7276#7506#0" expanded="true" />
-                <element signature="e#7551#7662#0" expanded="true" />
-                <element signature="e#7705#7844#0" expanded="true" />
-                <element signature="e#7999#9517#0" expanded="true" />
-                <element signature="e#9635#10265#0" expanded="true" />
-                <element signature="e#10427#11274#0" expanded="true" />
-                <element signature="e#11311#11361#0" expanded="true" />
-                <element signature="e#11389#11673#0" expanded="true" />
-                <element signature="e#12739#14562#0" expanded="true" />
+                <element signature="e#3569#3662#0" expanded="true" />
+                <element signature="e#3680#4587#0" expanded="false" />
+                <element signature="e#3715#3879#0" expanded="true" />
+                <element signature="e#3917#4587#0" expanded="true" />
+                <element signature="e#4640#4753#0" expanded="true" />
+                <element signature="e#4813#4933#0" expanded="true" />
+                <element signature="e#4984#5096#0" expanded="true" />
+                <element signature="e#5140#5204#0" expanded="true" />
+                <element signature="e#5233#5381#0" expanded="true" />
+                <element signature="e#5419#5472#0" expanded="true" />
+                <element signature="e#5521#5954#0" expanded="true" />
+                <element signature="e#6004#6208#0" expanded="true" />
+                <element signature="e#6238#6298#0" expanded="true" />
+                <element signature="e#6331#6359#0" expanded="true" />
+                <element signature="e#6405#6574#0" expanded="true" />
+                <element signature="e#6625#6663#0" expanded="true" />
+                <element signature="e#6693#6938#0" expanded="true" />
+                <element signature="e#7004#7234#0" expanded="true" />
+                <element signature="e#7279#7390#0" expanded="true" />
+                <element signature="e#7433#7572#0" expanded="true" />
+                <element signature="e#7727#9245#0" expanded="true" />
+                <element signature="e#9363#9993#0" expanded="true" />
+                <element signature="e#10155#11002#0" expanded="true" />
+                <element signature="e#11039#11089#0" expanded="true" />
+                <element signature="e#11117#11401#0" expanded="true" />
+                <element signature="e#12467#14290#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -584,7 +584,14 @@
       <option name="project" value="LOCAL" />
       <updated>1507504621570</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Added cool animations, for when bird dies. It seems that the evolution now works a bit less good than previous commit. Note That">
+      <created>1507508846989</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1507508846989</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -640,7 +647,8 @@
     <MESSAGE value="Copy Cat ML is now finished, &#10;Started working on an evolution algorithm for birds to learn by themselves.&#10;&#10;for now, only the first generation is randomly generated, sometimes a smart bird is born." />
     <MESSAGE value="Evolution Algorithm is now finished, &#10;Algorithms Implemented:&#10;Elitism Selection&#10;Two Points Crossover&#10;Regular Random Mutation&#10;&#10;For now, the fitness function is not optimal, but works. further more needs to be implemented.&#10;Also, the UI needs to be far more informative and neat." />
     <MESSAGE value="Added Info about the Copy Cat ML Flappy Bird at the start of the file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Info about the Copy Cat ML Flappy Bird at the start of the file" />
+    <MESSAGE value="Added cool animations, for when bird dies. It seems that the evolution now works a bit less good than previous commit. Note That" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added cool animations, for when bird dies. It seems that the evolution now works a bit less good than previous commit. Note That" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -806,8 +814,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/FlappyBird ML Evolution.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1298">
-          <caret line="194" column="24" lean-forward="true" selection-start-line="194" selection-start-column="24" selection-end-line="194" selection-end-column="24" />
+        <state relative-caret-position="136">
+          <caret line="39" column="16" lean-forward="true" selection-start-line="39" selection-start-column="16" selection-end-line="39" selection-end-column="16" />
           <folding>
             <element signature="e#1135#2351#0" expanded="false" />
             <element signature="e#1177#1599#0" expanded="true" />
@@ -815,32 +823,32 @@
             <element signature="e#2399#3186#0" expanded="true" />
             <element signature="e#3223#3347#0" expanded="true" />
             <element signature="e#3391#3520#0" expanded="true" />
-            <element signature="e#3569#3934#0" expanded="true" />
-            <element signature="e#3952#4859#0" expanded="false" />
-            <element signature="e#3987#4151#0" expanded="true" />
-            <element signature="e#4189#4859#0" expanded="true" />
-            <element signature="e#4912#5025#0" expanded="true" />
-            <element signature="e#5085#5205#0" expanded="true" />
-            <element signature="e#5256#5368#0" expanded="true" />
-            <element signature="e#5412#5476#0" expanded="true" />
-            <element signature="e#5505#5653#0" expanded="true" />
-            <element signature="e#5691#5744#0" expanded="true" />
-            <element signature="e#5793#6226#0" expanded="true" />
-            <element signature="e#6276#6480#0" expanded="true" />
-            <element signature="e#6510#6570#0" expanded="true" />
-            <element signature="e#6603#6631#0" expanded="true" />
-            <element signature="e#6677#6846#0" expanded="true" />
-            <element signature="e#6897#6935#0" expanded="true" />
-            <element signature="e#6965#7210#0" expanded="true" />
-            <element signature="e#7276#7506#0" expanded="true" />
-            <element signature="e#7551#7662#0" expanded="true" />
-            <element signature="e#7705#7844#0" expanded="true" />
-            <element signature="e#7999#9517#0" expanded="true" />
-            <element signature="e#9635#10265#0" expanded="true" />
-            <element signature="e#10427#11274#0" expanded="true" />
-            <element signature="e#11311#11361#0" expanded="true" />
-            <element signature="e#11389#11673#0" expanded="true" />
-            <element signature="e#12739#14562#0" expanded="true" />
+            <element signature="e#3569#3662#0" expanded="true" />
+            <element signature="e#3680#4587#0" expanded="false" />
+            <element signature="e#3715#3879#0" expanded="true" />
+            <element signature="e#3917#4587#0" expanded="true" />
+            <element signature="e#4640#4753#0" expanded="true" />
+            <element signature="e#4813#4933#0" expanded="true" />
+            <element signature="e#4984#5096#0" expanded="true" />
+            <element signature="e#5140#5204#0" expanded="true" />
+            <element signature="e#5233#5381#0" expanded="true" />
+            <element signature="e#5419#5472#0" expanded="true" />
+            <element signature="e#5521#5954#0" expanded="true" />
+            <element signature="e#6004#6208#0" expanded="true" />
+            <element signature="e#6238#6298#0" expanded="true" />
+            <element signature="e#6331#6359#0" expanded="true" />
+            <element signature="e#6405#6574#0" expanded="true" />
+            <element signature="e#6625#6663#0" expanded="true" />
+            <element signature="e#6693#6938#0" expanded="true" />
+            <element signature="e#7004#7234#0" expanded="true" />
+            <element signature="e#7279#7390#0" expanded="true" />
+            <element signature="e#7433#7572#0" expanded="true" />
+            <element signature="e#7727#9245#0" expanded="true" />
+            <element signature="e#9363#9993#0" expanded="true" />
+            <element signature="e#10155#11002#0" expanded="true" />
+            <element signature="e#11039#11089#0" expanded="true" />
+            <element signature="e#11117#11401#0" expanded="true" />
+            <element signature="e#12467#14290#0" expanded="true" />
           </folding>
         </state>
       </provider>
