@@ -35,9 +35,14 @@ PIPE_HEAD_WIDTH = BLOCKS_WIDTH + PIPE_HEAD_OFFSET
 bird_id = 0
 miles_count = 0
 max_fitness = 0
-FUCK_FACTOR = 4
+FUCK_FACTOR = 2
+RANDOM_GENE_FACTOR = 500
+MEMORY_SIZE = 15
+FLAP = 1
+NO_FLAP = 0
+
 """-----------Control Panel------------"""
-FPS = 1000
+FPS = 100
 VELOCITY = 0.15
 BLOCKS_SPEED = 3
 BACK_MOVIE_SPEED = 1
@@ -157,10 +162,11 @@ class Bird:
     def __init__(self, id):
         self.id = id
         self.bird_image = pygame.image.load("images/flappybird.png")
+        self.dead_image = pygame.image.load("images/flappybird_dead.png")
         self.flap_force = BIRD_FLAP_FORCE
         self.speed = 0
         self.tilt = 0
-        self.rect = pygame.Rect(W/3, H/3, 36, 28)
+        self.rect = pygame.Rect(W/3, H/4, 36, 28)
         self.passed_pipe = False
         self.score = 0
         self.alive = True
@@ -169,12 +175,14 @@ class Bird:
 
     def calculate_fitness(self, pipes):
         global max_fitness
-        self.fitness = FrameCount
-        if self.fitness > max_fitness:
-            max_fitness = self.fitness
+        if self.alive:
+            self.fitness = FrameCount - abs(self.rect.y - pipes.info_rect.y)
+            if self.fitness > max_fitness:
+                max_fitness = self.fitness
 
     def kill(self):
         self.alive = False
+        self.bird_image = self.dead_image
 
     def do_flap(self):
         self.speed = self.flap_force
@@ -207,7 +215,7 @@ class Evolution():
 
     def do_first_generation(self):
         for bird in self.birds:
-            bird.mind.add_random_training_data(15)
+            bird.mind.add_random_training_data(MEMORY_SIZE)
             bird.mind.fit()
 
     def elitism_selection(self):
@@ -256,9 +264,8 @@ class Evolution():
                 random_index = randint(0,len(child_info_chain))
                 for i, info_gene in enumerate(child_info_chain):
                     if i == random_index:
-                        child_info_chain[i] = [randint(-500, 500), randint(-500, 500)]
-                        child_result_chain[i] = [randint(0,1)]
-
+                        child_info_chain[i] = [randint(0-RANDOM_GENE_FACTOR, RANDOM_GENE_FACTOR), randint(0-RANDOM_GENE_FACTOR, RANDOM_GENE_FACTOR)]
+                        child_result_chain[i] = [randint(NO_FLAP, FLAP)]
 
     # Creating new generation of birds by using,
     # 1. Elitism Selection
@@ -295,11 +302,14 @@ class Evolution():
 
 def do_physics(bird):
     # bird falling and flapping physics
-    bird.speed -= VELOCITY
-    bird.rect.y -= bird.speed
+    if bird.alive:
+        bird.speed -= VELOCITY
+        bird.rect.y -= bird.speed
 
-    if bird.speed > -90:
-        bird.tilt = bird.speed * BIRD_ANDGLE_FACTOR
+        if bird.speed > -90:
+            bird.tilt = bird.speed * BIRD_ANDGLE_FACTOR
+    elif bird.rect.x > 0- bird.rect.width:
+        bird.rect.x -= BLOCKS_SPEED
 def events():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -333,7 +343,7 @@ def main():
     init_pygame()
 
     # Creating Birds
-    evo = Evolution(6)
+    evo = Evolution(4)
     evo.do_first_generation()
 
     back_movie = Movie(background)
@@ -349,43 +359,43 @@ def main():
         pipes.draw_blocks()
 
         for bird in evo.birds:
-            if bird.alive:
-                do_physics(bird)
-                bird.draw()
+            # if bird.alive:
+            do_physics(bird)
+            bird.draw()
 
-                # if pipe is out of screen, deletes it
-                # and creating a new one
-                if pipes.X <= 0 - BLOCKS_WIDTH:
-                    pipes = PipeSet()
-                    bird.passed_pipe = False
-                # if normal state, moves the pipe left
-                else:
-                    horizontal_distance = pipes.info_rect.x - bird.rect.x
-                    vertical_distance = pipes.info_rect.y - bird.rect.y
+            # if pipe is out of screen, deletes it
+            # and creating a new one
+            if pipes.X <= 0 - PIPE_HEAD_WIDTH:
+                pipes = PipeSet()
+                bird.passed_pipe = False
+                if len(evo.alive_birds()) == 0:
+                    evo.advance_generation()
 
-                    # collision detection between bird and pipes or
-                    # if bird is out of boundaries of screen
-                    if pipes.is_colliding_bird(bird) or bird.rect.y >= H + bird.rect.height or bird.rect.y <= 0-bird.rect.height * 2:
-                        bird.kill()
-                    # bird passed the pipe successfully
-                    if bird.is_passed_pipe(pipes):
-                        bird.score += 1
-                        if bird.distance_from_pipe(pipes) <= 50:
-                            pass #
+            # if normal state, moves the pipe left
+            else:
+                horizontal_distance = pipes.info_rect.x - bird.rect.x
+                vertical_distance = pipes.info_rect.y - bird.rect.y
 
-                    if all(bird.mind.predict((horizontal_distance, vertical_distance))):
-                        bird.do_flap()
+                # collision detection between bird and pipes or
+                # if bird is out of boundaries of screen
+                if pipes.is_colliding_bird(bird) or bird.rect.y >= H + bird.rect.height or bird.rect.y <= 0-bird.rect.height * 2:
+                    bird.kill()
+                # bird passed the pipe successfully
+                if bird.is_passed_pipe(pipes):
+                    bird.score += 1
+                    if bird.distance_from_pipe(pipes) <= 50:
+                        pass #
 
-                    bird.calculate_fitness(pipes)
+                if all(bird.mind.predict((horizontal_distance, vertical_distance))):
+                    bird.do_flap()
+
+                bird.calculate_fitness(pipes)
 
         print_stats(evo)
         pygame.display.update()
         Clock.tick(FPS)
 
         if events() == "QUIT": break
-        if len(evo.alive_birds()) == 0:
-            pipes = PipeSet()
-            evo.advance_generation()
 
     pygame.quit()
     sys.exit()
