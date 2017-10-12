@@ -231,7 +231,7 @@ class Evolution():
             # two point crossover
             # selecting two random points at the bird memory
             genes_chain_len = len(female_genes[0])
-            slice_indexes = (randint(0, genes_chain_len / 2), randint(genes_chain_len/ 2, genes_chain_len) )
+            slice_indexes = (randint(0, int(genes_chain_len / 2)), randint(int(genes_chain_len/ 2), genes_chain_len) )
             # possible that last random index needs to be 1 less ??
 
             # mixing the genes for two new babies
@@ -277,7 +277,7 @@ class Evolution():
         # selecting two most fittest birds
         woman_bird, man_bird = self.elitism_selection()
 
-        for i in range(self.num_of_birds / 2):
+        for i in range(int(self.num_of_birds / 2)):
             # making them fall in love, and taking their children, repeatedly
             children_genes = self.love(woman_bird, man_bird)
             # then mutating a bit of their genes for a finale
@@ -340,7 +340,7 @@ def main():
     init_pygame()
 
     # Creating Birds
-    evo = Evolution(4)
+    evo = Evolution(10)
     evo.do_first_generation()
 
     back_movie = Movie(background)

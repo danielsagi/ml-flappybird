@@ -193,7 +193,7 @@ class FlappyLearn:
             if abs(diff[0]) > DIFF_FACTOR and abs(diff[1]) > DIFF_FACTOR:
                 self.Flaps_Info_Array.append([horizontal_distance, vertical_distance])
                 self.Flaps_Results_Array.append([value])
-                print "Auto Add: ", value
+                print("Auto Add: ", value)
 
                 # if a new insertion has taken place, refitting the tree
                 self.fit()
@@ -201,13 +201,13 @@ class FlappyLearn:
         horizontal_distance, vertical_distance, value = data
         self.Flaps_Info_Array.append([horizontal_distance, vertical_distance])
         self.Flaps_Results_Array.append([value])
-        if value == 1: print "Added Clap"
+        if value == 1: print("Added Clap")
 
     def remove_wrong_move_from_training_data(self):
         """ Removing all data after wrong move, including the move itself """
         self.Flaps_Results_Array = self.Flaps_Results_Array[:self.last_index -3]
         self.Flaps_Info_Array = self.Flaps_Info_Array[:self.last_index -3]
-        print "Loser At: " + str(self.last_index) + " End At: " + str(len(self.Flaps_Info_Array))
+        print("Loser At: " + str(self.last_index) + " End At: " + str(len(self.Flaps_Info_Array)))
 
         self.move_removed = True
     def clear_training_data(self):
@@ -335,7 +335,7 @@ def main():
             Score += 1
             if distance_from_pipe(bird, pipes) <= 50:
                 copy_mind.last_index = len(copy_mind.Flaps_Info_Array) - 1
-                print "Saved Last Index -", copy_mind.last_index
+                print("Saved Last Index -", copy_mind.last_index)
 
         # if pipe is out of screen, deletes it
         # and creating a new one
