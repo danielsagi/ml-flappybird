@@ -6,6 +6,7 @@ from random import randint
 ------------------------------------BY: DANIEL SAGI-----------------------------------"""
 Score = 0
 exit = False
+FrameRate = 0
 #
 pygame.font.init()
 score_font = pygame.font.SysFont('Comic Sans MS', 30)
@@ -41,24 +42,19 @@ MAX_PIPE_OPENING = 160
 
 class Bird:
     def __init__(self):
-        self.x = W / 3
-        self.y = H / 3
         self.bird_image = pygame.image.load("images/flappybird.png")
-        self.height = 28
-        self.width = 36
-        self.color = BLACK
         self.flap_force = BIRD_FLAP_FORCE
         self.speed = 0
         self.tilt = 0
-        self.bird_rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.rect = pygame.Rect(W/3, H/4, 36, 28)
 
     def do_flap(self):
         self.speed = self.flap_force
 
     def draw(self):
-        picture = pygame.transform.scale(self.bird_image, (self.width,self.height))
+        picture = pygame.transform.scale(self.bird_image, (self.rect.width,self.rect.height))
         picture = pygame.transform.rotate(picture, self.tilt)
-        gameDisplay.blit(picture, (self.x, self.y, self.width, self.height))
+        gameDisplay.blit(picture, (self.rect.x, self.rect.y, self.rect.width, self.rect.height))
 
     def is_collided_with_blocks(self, pipeSet):
         return
@@ -104,7 +100,7 @@ class PipeSet:
         self.down_pipe = Pipe(self.down_height, False)
 
         #starting from edge
-        self.X = W + randint(0, 100)
+        self.X = W + PIPE_HEAD_WIDTH
 
         self.up_pipe_rect = pygame.Rect(self.X, 0, BLOCKS_WIDTH, self.up_height)
         self.down_pipe_rect = pygame.Rect(self.X, H - self.down_height, BLOCKS_WIDTH, self.down_height)
@@ -120,10 +116,10 @@ class PipeSet:
         self.down_pipe_rect.x -= offset
 
     def is_colliding_bird(self, bird):
-        return self.up_pipe_rect.colliderect(bird.bird_rect) or self.down_pipe_rect.colliderect(bird.bird_rect)
+        return self.up_pipe_rect.colliderect(bird.rect) or self.down_pipe_rect.colliderect(bird.rect)
 
     def is_behind_bird(self, bird):
-        if self.X + BLOCKS_WIDTH < bird.x and self.behind_bird == False:
+        if self.X + BLOCKS_WIDTH < bird.rect.x and self.behind_bird == False:
             self.behind_bird = True
             return True
         else:
@@ -163,8 +159,7 @@ def do_physics(bird):
 
     # bird falling and flapping physics
     bird.speed -= velocity
-    bird.y -= bird.speed
-    bird.bird_rect.y = bird.y
+    bird.rect.y -= bird.speed
 
     if bird.speed > -90:
         bird.tilt = bird.speed * BIRD_ANDGLE_FACTOR
@@ -196,17 +191,21 @@ def init_pygame():
 
 """------------ MAIN --------------"""
 def main():
-    global Score
+    global Score, FrameRate
     init_pygame()
     bird = Bird()
     back_movie = Movie(background)
 
     pipeSets = []
     while True:
+        FrameRate += 1
         if events(bird) == "QUIT": break
+        elif FrameRate % 99 == 0:
+            pipeSets.append(PipeSet())
+
 
         # if bird is out of boundaries of screen
-        if bird.y >= H + bird.height:
+        if bird.rect.y >= H + bird.rect.height:
             game_over_stall(bird)
             pipeSets = []
 
@@ -214,10 +213,6 @@ def main():
 
         back_movie.roll_display()
         do_physics(bird)
-
-        # appending first block set
-        if len(pipeSets) == 0:
-            pipeSets.append(PipeSet())
 
         bird.draw()
 
@@ -235,9 +230,6 @@ def main():
                 if pipeSet.is_colliding_bird(bird):
                     game_over_stall(bird)
                     pipeSets = []
-
-
-
 
         pygame.display.update()
         Clock.tick(FPS)

@@ -1,7 +1,5 @@
 import pygame
 import sys
-import numpy
-
 from sklearn import tree
 from random import randint
 
@@ -42,7 +40,7 @@ FLAP = 1
 NO_FLAP = 0
 
 """-----------Control Panel------------"""
-FPS = 120
+FPS = 1000
 VELOCITY = 0.15
 BLOCKS_SPEED = 4
 BACK_MOVIE_SPEED = 1
@@ -92,7 +90,7 @@ class PipeSet:
         self.down_pipe = Pipe(self.down_height, False)
 
         # starting from edge
-        self.X = W + randint(0, 100)
+        self.X = W + PIPE_HEAD_WIDTH
         self.up_pipe_rect = pygame.Rect(self.X, 0, BLOCKS_WIDTH, self.up_height)
         self.down_pipe_rect = pygame.Rect(self.X, H - self.down_height, BLOCKS_WIDTH, self.down_height)
 
@@ -166,7 +164,6 @@ class Bird:
         self.tilt = 0
         self.rect = pygame.Rect(W/3, H/4, 36, 28)
         self.passed_pipe = False
-        self.score = 0
         self.alive = True
         self.mind = FlappyLearn()
         self.fitness = 0
@@ -330,7 +327,7 @@ def print_stats(evo):
     for index ,bird in enumerate(fittest_birds):
         color = BLACK
         if not bird.alive: color = RED
-        bird_surface = score_font.render("Bird #"+str(bird.id) + " Score: " + str(bird.score) + " Fitness:"+ str(bird.fitness), False, color)
+        bird_surface = score_font.render("Bird #"+str(bird.id) + " Fitness:"+ str(bird.fitness), False, color)
         gameDisplay.blit(bird_surface, (0, index * 25))
 
 
@@ -344,49 +341,55 @@ def main():
     evo.do_first_generation()
 
     back_movie = Movie(background)
-    pipes = PipeSet()
-
+    pipesArray = []
+    pipesArray.append(PipeSet())
     while True:
         # Visuals
         gameDisplay.fill(SKY_BLUE)
         back_movie.roll_display()
         FrameCount += 1
 
-        pipes.move_block(BLOCKS_SPEED)
-        pipes.draw_blocks()
+        if FrameCount % 99 ==0:
+            pipesArray.append(PipeSet())
+
+        for pipes in pipesArray:
+            pipes.move_block(BLOCKS_SPEED)
+            pipes.draw_blocks()
 
         for bird in evo.birds:
             # if bird.alive:
             do_physics(bird)
             bird.draw()
 
-            # if pipe is out of screen, deletes it
-            # and creating a new one
-            if pipes.X <= 0 - PIPE_HEAD_WIDTH:
-                pipes = PipeSet()
-                bird.passed_pipe = False
-                if len(evo.alive_birds()) == 0:
-                    evo.advance_generation()
 
-            # if normal state, moves the pipe left
-            else:
-                horizontal_distance = pipes.info_rect.x - bird.rect.x
-                vertical_distance = pipes.info_rect.y - bird.rect.y
-
-                # collision detection between bird and pipes or
-                # if bird is out of boundaries of screen
-                if pipes.is_colliding_bird(bird) or bird.rect.y >= H + bird.rect.height or bird.rect.y <= 0-bird.rect.height * 2:
-                    bird.kill()
+            # setting closest pipe
+            next_pipe = pipesArray[0]
+            for i, pipes in enumerate(pipesArray):
                 # bird passed the pipe successfully
                 if bird.is_passed_pipe(pipes):
-                    bird.score += 1
-                    if bird.distance_from_pipe(pipes) <= 50:
-                        pass #
+                    if i < len(pipesArray) - 1:
+                        next_pipe = pipesArray[i + 1]
+                        bird.passed_pipe = False
 
-                if all(bird.mind.predict((horizontal_distance, vertical_distance))):
-                    bird.do_flap()
+                # if pipe is out of screen, deletes it
+                if pipes.X <= 0 - PIPE_HEAD_WIDTH:
+                    if len(evo.alive_birds()) == 0:
+                        pipesArray = [PipeSet()]
+                        evo.advance_generation()
 
-                bird.calculate_fitness(pipes)
+            # setting info to current bird with the closest pipe
+            horizontal_distance = next_pipe.info_rect.x - bird.rect.x
+            vertical_distance = next_pipe.info_rect.y - bird.rect.y
+
+            # collision detection between bird and pipes or
+            # if bird is out of boundaries of screen
+            if next_pipe.is_colliding_bird(bird) or bird.rect.y >= H + bird.rect.height or bird.rect.y <= 0-bird.rect.height * 2:
+                bird.kill()
+
+            if all(bird.mind.predict((horizontal_distance, vertical_distance))):
+                bird.do_flap()
+
+            bird.calculate_fitness(next_pipe)
 
         print_stats(evo)
         pygame.display.update()
