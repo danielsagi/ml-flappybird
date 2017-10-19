@@ -9,8 +9,10 @@ FrameCount = 0
 exit = False
 #
 pygame.font.init()
-score_font = pygame.font.SysFont('Comic Sans MS', 30)
+score_font = pygame.font.SysFont('cambria', 30)
 game_over_font = pygame.font.SysFont('Comic Sans MS', 45)
+score_font_small = pygame.font.SysFont('cambria', 20)
+
 background = pygame.image.load("images/bg.png")
 
 gameDisplay = None
@@ -20,9 +22,12 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 SKY_BLUE = (0, 153, 204)
+BLUE = (0, 153, 140)
+GREEN = (115, 191, 46)
 #
 H = 650
 W = 800
+SCREEN_OFFSET = 300
 #
 BLOCKS_WIDTH = 60
 BLOCKS_SPACE = 350
@@ -40,7 +45,7 @@ FLAP = 1
 NO_FLAP = 0
 
 """-----------Control Panel------------"""
-FPS = 1000
+FPS = 250
 VELOCITY = 0.15
 BLOCKS_SPEED = 4
 BACK_MOVIE_SPEED = 1
@@ -49,6 +54,7 @@ BIRD_FLAP_FORCE = 5
 MIN_PIPE_OPENING = 160
 MAX_PIPE_OPENING = 160
 """------------------------------------"""
+
 
 class Pipe:
     def __init__(self, height, isUp):
@@ -76,6 +82,8 @@ class Pipe:
                                          H - self.body_height - PIPE_HEAD_HEIGHT,
                                          PIPE_HEAD_WIDTH,
                                          PIPE_HEAD_HEIGHT))
+
+
 class PipeSet:
     def __init__(self):
         self.opening_size = randint(MIN_PIPE_OPENING, MAX_PIPE_OPENING)
@@ -109,6 +117,8 @@ class PipeSet:
 
     def is_colliding_bird(self, bird):
         return self.up_pipe_rect.colliderect(bird.rect) or self.down_pipe_rect.colliderect(bird.rect)
+
+
 class Movie:
     def __init__(self, image):
         self.source_image = image
@@ -131,6 +141,7 @@ class Movie:
             image_rect.x -= BACK_MOVIE_SPEED
             gameDisplay.blit(self.source_image, image_rect)
 
+
 class FlappyLearn:
     def __init__(self):
         self.clf = tree.DecisionTreeClassifier()
@@ -139,11 +150,13 @@ class FlappyLearn:
 
     def add_random_training_data(self, quantity):
         for i in range(quantity):
-            self.add_to_training_data(( randint(-500, 500), randint(-500, 500), randint(0,1)))
+            self.add_to_training_data((randint(-500, 500), randint(-500, 500), randint(0, 1)))
+
     def add_to_training_data(self, data):
         a, b, value = data
         self.Flaps_Info_Array.append([a, b])
         self.Flaps_Results_Array.append([value])
+
     def clear_training_data(self):
         self.Flaps_Info_Array = []
         self.Flaps_Results_Array = []
@@ -151,9 +164,12 @@ class FlappyLearn:
     def fit(self):
         # print type(self.Flaps_Info_Array), type(self.Flaps_Results_Array)
         self.clf = self.clf.fit(self.Flaps_Info_Array, self.Flaps_Results_Array)
+
     def predict(self, data):
         a, b = data
         return self.clf.predict([[a, b]])
+
+
 class Bird:
     def __init__(self, id):
         self.id = id
@@ -162,7 +178,7 @@ class Bird:
         self.flap_force = BIRD_FLAP_FORCE
         self.speed = 0
         self.tilt = 0
-        self.rect = pygame.Rect(W/3, H/4, 36, 28)
+        self.rect = pygame.Rect(W / 3, H / 4, 36, 28)
         self.passed_pipe = False
         self.alive = True
         self.mind = FlappyLearn()
@@ -195,8 +211,10 @@ class Bird:
     def draw(self):
         picture = pygame.transform.scale(self.bird_image, (self.rect.width, self.rect.height))
         picture = pygame.transform.rotate(picture, self.tilt)
-        gameDisplay.blit(picture, (self.rect.x, self.rect.y, self.rect.width, self.rect.height))
-class Evolution():
+        gameDisplay.blit(picture, self.rect)
+
+
+class Evolution:
     def __init__(self, num_of_birds):
         global bird_id
         self.num_of_birds = num_of_birds
@@ -220,33 +238,33 @@ class Evolution():
     # CrossOver
     # Taking the two most fittest birds, and returning their demon love children
     def love(self, female_bird, male_bird):
-            female_genes = (female_bird.mind.Flaps_Info_Array, female_bird.mind.Flaps_Results_Array)
-            male_genes = (male_bird.mind.Flaps_Info_Array, male_bird.mind.Flaps_Results_Array)
+        female_genes = (female_bird.mind.Flaps_Info_Array, female_bird.mind.Flaps_Results_Array)
+        male_genes = (male_bird.mind.Flaps_Info_Array, male_bird.mind.Flaps_Results_Array)
 
-            """After Some Time... *CENSORED*... And The Seed Is IN!"""
-            """Now, Mixing Some Genes"""
-            # two point crossover
-            # selecting two random points at the bird memory
-            genes_chain_len = len(female_genes[0])
-            slice_indexes = (randint(0, int(genes_chain_len / 2)), randint(int(genes_chain_len/ 2), genes_chain_len) )
-            # possible that last random index needs to be 1 less ??
+        """After Some Time... *CENSORED*... And The Seed Is IN!"""
+        """Now, Mixing Some Genes"""
+        # two point crossover
+        # selecting two random points at the bird memory
+        genes_chain_len = len(female_genes[0])
+        slice_indexes = (randint(0, int(genes_chain_len / 2)), randint(int(genes_chain_len / 2), genes_chain_len))
+        # possible that last random index needs to be 1 less ??
 
-            # mixing the genes for two new babies
-            first_baby_genes = []
-            for i in range(2):
-                first_baby_genes.append(female_genes[i][:slice_indexes[0]] + \
-                                        male_genes[i][slice_indexes[0]:slice_indexes[1]] + \
-                                        female_genes[i][slice_indexes[1]:genes_chain_len])
+        # mixing the genes for two new babies
+        first_baby_genes = []
+        for i in range(2):
+            first_baby_genes.append(female_genes[i][:slice_indexes[0]] + \
+                                    male_genes[i][slice_indexes[0]:slice_indexes[1]] + \
+                                    female_genes[i][slice_indexes[1]:genes_chain_len])
 
-            second_baby_genes = []
-            for i in range(2):
-                second_baby_genes.append(male_genes[i][:slice_indexes[0]] + \
-                                        female_genes[i][slice_indexes[0]:slice_indexes[1]] + \
-                                        male_genes[i][slice_indexes[1]:genes_chain_len])
+        second_baby_genes = []
+        for i in range(2):
+            second_baby_genes.append(male_genes[i][:slice_indexes[0]] + \
+                                     female_genes[i][slice_indexes[0]:slice_indexes[1]] + \
+                                     male_genes[i][slice_indexes[1]:genes_chain_len])
 
-            # returning the babies, separated from their parents at birth,
-            # in the form of a tuple containing two lists
-            return (first_baby_genes, second_baby_genes)
+        # returning the babies, separated from their parents at birth,
+        # in the form of a tuple containing two lists
+        return (first_baby_genes, second_baby_genes)
 
     # fucking them up a bit with freshly random generated genes
     def fuck_them_up_a_bit(self, children):
@@ -256,10 +274,11 @@ class Evolution():
 
             for i in range(FUCK_FACTOR):
                 # selecting random gene to alter
-                random_index = randint(0,len(child_info_chain))
+                random_index = randint(0, len(child_info_chain))
                 for i, info_gene in enumerate(child_info_chain):
                     if i == random_index:
-                        child_info_chain[i] = [randint(0-RANDOM_GENE_FACTOR, RANDOM_GENE_FACTOR), randint(0-RANDOM_GENE_FACTOR, RANDOM_GENE_FACTOR)]
+                        child_info_chain[i] = [randint(0 - RANDOM_GENE_FACTOR, RANDOM_GENE_FACTOR),
+                                               randint(0 - RANDOM_GENE_FACTOR, RANDOM_GENE_FACTOR)]
                         child_result_chain[i] = [randint(NO_FLAP, FLAP)]
 
     # Creating new generation of birds by using,
@@ -295,6 +314,34 @@ class Evolution():
     def alive_birds(self):
         return [bird for bird in self.birds if bird.alive]
 
+
+class InfoTable:
+    def __init__(self):
+        self.background_rect = pygame.Rect(W, 0, SCREEN_OFFSET, H)
+        self.separator_rect = pygame.Rect(W, 0, 10, H)
+
+        self.plus_fps = pygame.image.load("images\plus.png")
+        # self.plus_fps.x = W+SCREEN_OFFSET - 80
+        self.plus_fps = pygame.transform.scale(self.plus_fps, (15, 15))
+        self.minus_fps = pygame.image.load("images\minus.png")
+        # self.minus_fps.x = W+SCREEN_OFFSET - 100
+        self.minus_fps = pygame.transform.scale(self.minus_fps, (15, 15))
+
+        self.fps_surface = score_font_small.render("Fps: " + str(FPS), False, BLACK)
+
+    def draw(self):
+        pygame.draw.rect(gameDisplay, SKY_BLUE, self.background_rect)
+        pygame.draw.rect(gameDisplay, GREEN, self.separator_rect)
+        gameDisplay.blit(self.fps_surface, (W + SCREEN_OFFSET / 3, 15))
+        gameDisplay.blit(self.minus_fps, self.minus_fps.get_rect(x = W+SCREEN_OFFSET - 100, y= 20))
+        gameDisplay.blit(self.plus_fps, self.plus_fps.get_rect(x = W+SCREEN_OFFSET - 80, y= 20))
+
+    def click_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x,y = event.pos
+                # if self.minus_fps.get_rect().col
+
 def do_physics(bird):
     # bird falling and flapping physics
     if bird.alive:
@@ -303,42 +350,55 @@ def do_physics(bird):
 
         if bird.speed > -90:
             bird.tilt = bird.speed * BIRD_ANDGLE_FACTOR
-    elif bird.rect.x > 0- bird.rect.width:
+    elif bird.rect.x > 0 - bird.rect.width:
         bird.rect.x -= BLOCKS_SPEED
+
+
 def events():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return "QUIT"
+
+
+
 def init_pygame():
     global gameDisplay, Clock
-    gameDisplay = pygame.display.set_mode((W, H))
+    gameDisplay = pygame.display.set_mode((W + SCREEN_OFFSET, H))
     Clock = pygame.time.Clock()
     pygame.display.set_caption("Flappy Bird - Daniel Sagi")
     icon = pygame.image.load("images/icon.png")
     pygame.display.set_icon(icon)
 
     pygame.init()
+
+
 def print_stats(evo):
     fittest_birds = sorted(evo.birds, key=lambda x: x.fitness, reverse=True)[:5]
 
-    generation = score_font.render("Generation: " + str(evo.current_generation) + " | Max Fitness: " + str(max_fitness), False, SKY_BLUE)
-    gameDisplay.blit(generation, (W/ 4, H - 70))
+    generation = score_font.render("Generation: " + str(evo.current_generation) + " | Max Fitness: " + str(max_fitness),
+                                   False, SKY_BLUE)
+    gameDisplay.blit(generation, (W / 4, H - 70))
 
-    for index ,bird in enumerate(fittest_birds):
+    for index, bird in enumerate(fittest_birds):
         color = BLACK
         if not bird.alive: color = RED
-        bird_surface = score_font.render("Bird #"+str(bird.id) + " Fitness:"+ str(bird.fitness), False, color)
+        bird_surface = score_font.render("Bird #" + str(bird.id) + " Fitness:" + str(bird.fitness), False, color)
         gameDisplay.blit(bird_surface, (0, index * 25))
 
 
 """------------ MAIN --------------"""
+
+
 def main():
     global FrameCount
     init_pygame()
+    info_table = InfoTable()
 
     # Creating Birds
     evo = Evolution(10)
     evo.do_first_generation()
+
+    print(pygame.font.get_fonts())
 
     back_movie = Movie(background)
     pipesArray = []
@@ -349,7 +409,7 @@ def main():
         back_movie.roll_display()
         FrameCount += 1
 
-        if FrameCount % 99 ==0:
+        if FrameCount % 99 == 0:
             pipesArray.append(PipeSet())
 
         for pipes in pipesArray:
@@ -360,7 +420,6 @@ def main():
             # if bird.alive:
             do_physics(bird)
             bird.draw()
-
 
             # setting closest pipe
             next_pipe = pipesArray[0]
@@ -383,7 +442,8 @@ def main():
 
             # collision detection between bird and pipes or
             # if bird is out of boundaries of screen
-            if next_pipe.is_colliding_bird(bird) or bird.rect.y >= H + bird.rect.height or bird.rect.y <= 0-bird.rect.height * 2:
+            if next_pipe.is_colliding_bird(
+                    bird) or bird.rect.y >= H + bird.rect.height or bird.rect.y <= 0 - bird.rect.height * 2:
                 bird.kill()
 
             if all(bird.mind.predict((horizontal_distance, vertical_distance))):
@@ -392,6 +452,8 @@ def main():
             bird.calculate_fitness(next_pipe)
 
         print_stats(evo)
+        info_table.draw()
+
         pygame.display.update()
         Clock.tick(FPS)
 
