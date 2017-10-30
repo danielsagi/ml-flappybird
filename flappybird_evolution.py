@@ -1,6 +1,7 @@
 import pygame
 import sys
 from sklearn import tree
+from sklearn.neural_network import MLPClassifier
 from random import randint
 
 """----------------------------------FLAPPY BIRD-----------------------------------------
@@ -45,7 +46,7 @@ FLAP = 1
 NO_FLAP = 0
 
 """-----------Control Panel------------"""
-FPS = 250
+FPS = 1500
 VELOCITY = 0.15
 BLOCKS_SPEED = 4
 BACK_MOVIE_SPEED = 1
@@ -144,7 +145,8 @@ class Movie:
 
 class FlappyLearn:
     def __init__(self):
-        self.clf = tree.DecisionTreeClassifier()
+        # self.clf = tree.DecisionTreeClassifier()
+        self.clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes = (MEMORY_SIZE - int(MEMORY_SIZE / 3), 5), random_state = 1)
         self.Flaps_Info_Array = []
         self.Flaps_Results_Array = []
 
