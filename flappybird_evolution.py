@@ -46,7 +46,7 @@ FLAP = 1
 NO_FLAP = 0
 
 """-----------Control Panel------------"""
-FPS = 1500
+FPS = 100
 VELOCITY = 0.15
 BLOCKS_SPEED = 4
 BACK_MOVIE_SPEED = 1
